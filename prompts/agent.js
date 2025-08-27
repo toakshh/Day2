@@ -1,5 +1,6 @@
 import OpenAI from "openai"
 import "dotenv/config"
+import { exec } from 'child_process'
 
 const agent = async() => {
 
@@ -11,6 +12,7 @@ const agent = async() => {
 
     Available ToolS:
     - getWeatherData(cityName: string) : Returns the current weather data of the city.
+    - executeCommands(cmd:string) : Takes a command as args and executes the command on user's machines and return output.
 
     Rules: 
     - strictly follow the JSON output format.
@@ -38,7 +40,7 @@ const agent = async() => {
 
     let outputArray = [
         { role: "system", content: SYSTEM_PROMPTS },
-        { role: "user", content: "what's the weather in pune now?" }
+        { role: "user", content: "Push my code to github with new commit message" }
     ]
 
     const getWeatherData = async (cityName)=>{
@@ -53,7 +55,27 @@ const agent = async() => {
         }
     }
 
-    const TOOL_MAP = {getWeatherData}
+    const executeCommands = async (cmd)=>{
+        try{
+            return new Promise((res,rej)=>{
+                exec(cmd, (err, data)=>{
+                    if(err){
+                        return rej('failed to execute command')
+                    }else{
+                        res(data)
+                    }
+                })
+            })
+        }catch(e){
+            console.log(e)
+        }
+    }
+
+    const webSearch = async (query)=>{
+
+    }
+
+    const TOOL_MAP = {getWeatherData , executeCommands}
 
     const aiAgent = new OpenAI()
     while(true){
